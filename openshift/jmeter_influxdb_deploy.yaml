@@ -1,11 +1,11 @@
-apiVersion: apps/v1beta2
-kind: Deployment
+apiVersion: v1
+kind: DeploymentConfig
 metadata:
   name: influxdb-jmeter
   labels:
     app: influxdb-jmeter
 spec:
-  replicas: 1
+  replicas: "1"
   selector:
     matchLabels:
       app: influxdb-jmeter
@@ -16,7 +16,6 @@ spec:
     spec:
       containers:
         - image: influxdb
-          imagePullPolicy: IfNotPresent
           name: influxdb
           volumeMounts:
           - name: config-volume

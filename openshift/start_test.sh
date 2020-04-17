@@ -3,13 +3,12 @@
 #It requires that you supply the path to the jmx file
 #After execution, test script jmx file may be deleted from the pod itself but not locally.
 
-working_dir="`pwd`"
+working_dir=`pwd`
 
 #Get namesapce variable
-tenant=`awk '{print $NF}' "$working_dir/tenant_export"`
+# tenant=`awk '{print $NF}' $working_dir/tenant_export`
 
-jmx="$1"
-[ -n "$jmx" ] || read -p 'Enter path to the jmx file ' jmx
+read -p 'Enter path to the jmx file ' jmx
 
 if [ ! -f "$jmx" ];
 then
@@ -18,14 +17,18 @@ then
     exit
 fi
 
-test_name="$(basename "$jmx")"
-
 #Get Master pod details
 
-master_pod=`kubectl get po -n $tenant | grep jmeter-master | awk '{print $1}'`
+#master_pod=`kubectl get pod -n loadtesting | grep jmeter-master | awk '{print $1}'`
 
-kubectl cp "$jmx" -n $tenant "$master_pod:/$test_name"
+master_pod=`oc get pod  | grep jmeter-master | awk '{print $1}'`
+
+# kubectl cp $jmx -n $tenant $master_pod:/$jmx
+
+#oc cp $jmx $master_pod:/$jmx
+
+oc cp cloudssky.jmx $master_pod:/jmeter/cloudssky.jmx
 
 ## Echo Starting Jmeter load test
 
-kubectl exec -ti -n $tenant $master_pod -- /bin/bash /load_test "$test_name"
+oc exec -ti $master_pod -- /bin/bash /jmeter/load_test cloudssky.jmx
